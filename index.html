@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>SnackSense™ // Mobile Laboratory</title>
+  <title>SnackSense™ // Neural Research Laboratory</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
   <!-- Google Fonts for Native Cyber Aesthetic -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
   <!-- Vanilla CSS Stylesheet -->
   <link rel="stylesheet" href="styles.css">
   
@@ -20,17 +22,269 @@
 <body class="crt-filter">
   <div class="cyber-grid"></div>
 
-  <!-- Physical Smartphone Wrapper (Visible on Desktop, Stripped on Mobile) -->
-  <div class="phone-device">
-    <!-- Physical Side buttons -->
-    <div class="phone-button volume-up"></div>
-    <div class="phone-button volume-down"></div>
-    <div class="phone-button power-key"></div>
-    
-    <!-- Phone Screen Container -->
+  <!-- ==========================================================================
+     1. WIDESCREEN DESKTOP LABORATORY DASHBOARD (Visible on screens > 768px)
+     ========================================================================== -->
+  <div id="desktopApp" class="desktop-only-container">
+    <!-- Header -->
+    <header class="desktop-header">
+      <div class="header-branding">
+        <h1 class="logo-text" data-text="SNACKSENSE™">SNACKSENSE™</h1>
+        <span class="tagline">Artificial Intelligence for Artificial Ingredients.</span>
+      </div>
+      <div class="desktop-sys-status">
+        <div class="audio-toggle-badge" id="d-audioToggle" title="Toggle Sound FX">🔊 SOUND: ON</div>
+        <div class="status-box">
+          <span class="pulse-dot green"></span>
+          <span class="mono-label">SYS_STATUS: OPERATIONAL // MSG_RADAR: ARMED</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 3-Column Dashboard Workspace Grid -->
+    <div class="desktop-workspace-grid">
+      
+      <!-- COLUMN 1: Visual Specimen Chamber -->
+      <section class="desktop-card visual-chamber">
+        <div class="card-title-bar">
+          <span class="title-label">📷 VISUAL_SPECIMEN_CHAMBER // LIVE_FEED</span>
+          <span class="chamber-badge" id="d-hudChamberMode">WEB-CAM ACTIVE</span>
+        </div>
+        <div class="desktop-viewport">
+          <video id="desktopVideo" autoplay playsinline muted></video>
+          <canvas id="desktopCanvas"></canvas>
+          
+          <!-- HUD Scanning Telemetry -->
+          <div class="hud-scanning-crosshairs">
+            <div class="c-cross tl"></div>
+            <div class="c-cross tr"></div>
+            <div class="c-cross bl"></div>
+            <div class="c-cross br"></div>
+            <div class="hud-radar-line"></div>
+          </div>
+
+          <!-- Model Loader Spinner -->
+          <div id="d-modelSpinner" class="desktop-model-loader">
+            <div class="loader-spinner"></div>
+            <span class="loader-lbl">CONNECTING TENSORFLOW CORE...</span>
+          </div>
+
+          <!-- Synthetic Emulator containment grid -->
+          <div id="d-presetContainer" class="desktop-preset-overlay hidden">
+            <div class="overlay-instruction">SELECT SYNTHETIC SAMPLE POD:</div>
+            <div class="desktop-preset-grid">
+              <button class="d-preset-btn" data-snack="spicy_chips">🔥 Spicy Chips</button>
+              <button class="d-preset-btn" data-snack="ramen">🍜 Instant Ramen</button>
+              <button class="d-preset-btn" data-snack="energy_drink">⚡ Energy Drink</button>
+              <button class="d-preset-btn" data-snack="cookie">🍪 Desk Cookie</button>
+              <button class="d-preset-btn" data-snack="pizza">🍕 Midnight Pizza</button>
+              <button class="d-preset-btn" data-snack="banana">🍌 Sane Banana</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="desktop-viewport-controls">
+          <button class="d-action-btn primary disabled" id="d-btnTriggerScan">INITIATE DEEP SCAN</button>
+          <button class="d-action-btn secondary" id="d-btnToggleMode">EMULATE SPECIMEN</button>
+        </div>
+      </section>
+
+      <!-- COLUMN 2: Telemetry Spectrometer & Laboratory Settings -->
+      <div class="desktop-center-column">
+        <!-- Telemetry Card -->
+        <section class="desktop-card telemetry-card">
+          <div class="card-title-bar">
+            <span class="title-label">📊 SPECTROMETER_TELEMETRY</span>
+          </div>
+          <div class="card-body-mono">
+            <div class="tel-stats-grid">
+              <div class="stat-row"><span>OBJECT_CLASS:</span> <span class="text-pink bold" id="d-telClass">AWAITING CAPTURE...</span></div>
+              <div class="stat-row"><span>CONFIDENCE:</span> <span class="text-green" id="d-telConfidence">0.00%</span></div>
+              <div class="stat-row"><span>TENSOR_FPS:</span> <span id="d-telFPS">00.0 hz</span></div>
+            </div>
+
+            <div class="telemetry-bar-list">
+              <div class="bar-item">
+                <span class="bar-lbl">PRESERVATIVE SATURATION</span>
+                <div class="bar-track"><div class="bar-fill pink" id="d-barPreservatives" style="width: 0%"></div></div>
+              </div>
+              <div class="bar-item">
+                <span class="bar-lbl">CHAOTIC VIBE INDEX</span>
+                <div class="bar-track"><div class="bar-fill green" id="d-barVibe" style="width: 0%"></div></div>
+              </div>
+              <div class="bar-item">
+                <span class="bar-lbl">IMMEDIATE GUILT PROBABILITY</span>
+                <div class="bar-track"><div class="bar-fill amber" id="d-barRegret" style="width: 0%"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Configuration Settings Card -->
+        <section class="desktop-card settings-card">
+          <div class="card-title-bar">
+            <span class="title-label">⚙️ LABORATORY_SETTINGS</span>
+          </div>
+          <div class="card-body">
+            <div class="settings-split-grid">
+              <!-- Sliders -->
+              <div class="settings-col">
+                <span class="col-lbl">ENGINE PARAMETERS</span>
+                <div class="slider-group">
+                  <label>Sarcasm Roast Level: <span id="d-lblSarcasm">85%</span></label>
+                  <input type="range" class="d-slider" id="d-sliderSarcasm" min="10" max="100" value="85">
+                </div>
+                <div class="slider-group">
+                  <label>MSG Warning Threshold: <span id="d-lblMSG">80%</span></label>
+                  <input type="range" class="d-slider" id="d-sliderMSG" min="50" max="100" value="80">
+                </div>
+              </div>
+              
+              <!-- Toggles / Radio Moods -->
+              <div class="settings-col">
+                <span class="col-lbl">AI PERSONALITY MODIFIERS</span>
+                <div class="radio-mood-list">
+                  <label class="d-radio-row"><input type="radio" name="d-aiMood" value="cynical" checked> Cynical Anthropologist</label>
+                  <label class="d-radio-row"><input type="radio" name="d-aiMood" value="chaotic"> Monosodium Overlord</label>
+                  <label class="d-radio-row"><input type="radio" name="d-aiMood" value="cruel"> Active Hostility</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terminal Ticker Console -->
+            <div class="desktop-console-box" id="d-consoleTicker">
+              <p class="console-line text-green">&gt; Biosensor workspace locked. Ready for scan.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- COLUMN 3: Diagnostic Receipt Deck & Sound decrypter -->
+      <section class="desktop-card diagnostics-deck">
+        <div class="card-title-bar">
+          <span class="title-label">🧾 ANALYTICAL_DIAGNOSTICS_DECK</span>
+        </div>
+        
+        <div class="desktop-deck-split">
+          <!-- Printed Receipt Ticket wrapper -->
+          <div class="receipt-wrapper-scroll">
+            <div class="desktop-receipt-ticket" id="d-receiptToPrint">
+              <div class="thermal-laser"></div>
+              <div class="ticket-contents">
+                <div class="t-header">
+                  <h3>SNACKSENSE™ BIO-REPORT</h3>
+                  <div class="t-sub">AURA LABS NEURAL RESEARCH</div>
+                  <div class="t-dashes">--------------------------------</div>
+                </div>
+
+                <div class="t-meta">
+                  <div class="t-row"><span>SCAN_ID:</span> <span id="d-recScanId" class="bold-text">#9284-A19</span></div>
+                  <div class="t-row"><span>TIMESTAMP:</span> <span id="d-recTimestamp">2026-05-19 22:08</span></div>
+                  <div class="t-row"><span>OPERATOR:</span> <span class="bold-text">DESKTOP_LAB</span></div>
+                </div>
+                <div class="t-dashes">--------------------------------</div>
+
+                <div class="t-section-title">SPECIMEN DIAGNOSTICS</div>
+                <div class="t-stats">
+                  <div class="t-row highlight"><span class="bold-text">SPECIMEN:</span> <span id="d-recDetected" class="text-pink bold-text">UNKNOWN</span></div>
+                  <div class="t-row"><span>MSG SATURATION:</span> <span id="d-recMSG">98.4%</span></div>
+                  <div class="t-row"><span>CRUNCH INDEX:</span> <span id="d-recCrunch">9.2 / 10.0</span></div>
+                  <div class="t-row"><span>IMPULSIVITY:</span> <span id="d-recImpulsivity">87.0%</span></div>
+                </div>
+                <div class="t-dashes">--------------------------------</div>
+
+                <div class="t-section-title">PSYCHOSOCIAL ANALYSIS</div>
+                <div class="t-profile">
+                  <span class="lbl">Socioeconomic Tier:</span>
+                  <p class="val bold-text text-amber" id="d-recTier">LATE NIGHT COGNITIVE COPE</p>
+                </div>
+                <div class="t-profile">
+                  <span class="lbl">AI Tasting Notes:</span>
+                  <p class="val italic-text" id="d-recNotes">"Processed cheese powder, coding crashes, and severe regret."</p>
+                </div>
+                <div class="t-profile">
+                  <span class="lbl">Anthropological Audit:</span>
+                  <p class="val" id="d-recAudit">"Subject is consuming chemicals in response to critical existential deadline. Vibe check: Endangered."</p>
+                </div>
+                <div class="t-dashes">--------------------------------</div>
+
+                <div class="t-footer">
+                  <div class="t-barcode">||||| | ||||| ||| | ||| ||||</div>
+                  <div class="t-barcode-num">AURA360_BIORECON_SEC_7</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab Visualizer Columns (Aura & Scope) -->
+          <div class="desktop-lab-visualizers">
+            <!-- Aura Waves -->
+            <div class="d-visual-box">
+              <span class="box-lbl">AURA GRADIENT FIELD</span>
+              <div class="d-aura-canvas-wrap">
+                <canvas id="desktopAuraCanvas"></canvas>
+                <div class="d-aura-data">
+                  <div>AURA: <span id="d-auraName" class="text-pink bold">ACTIVE FIELD</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Oscilloscope decrypter -->
+            <div class="d-visual-box">
+              <span class="box-lbl">CRUNCH WAVE DECRYPTER</span>
+              <div class="d-osc-row">
+                <button class="d-action-btn secondary pulse-glow" id="d-btnPlayCrunch">🔊 DECRYPT CRISPINESS</button>
+                <div class="d-osc-canvas-wrap">
+                  <canvas id="desktopOscilloscopeCanvas"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Rows -->
+            <div class="d-action-row-group">
+              <button class="d-action-btn primary" id="d-btnDownloadReceipt">📥 SAVE REPORT CARD</button>
+              <button class="d-action-btn secondary" id="d-btnCopyShare">🔗 COPY CARD SUMMARY</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Fullscreen loader pyramid overlay on Deep Scan trigger -->
+    <div id="d-loaderOverlay" class="desktop-fullscreen-loader hidden">
+      <div class="loader-bg-blur"></div>
+      <div class="loader-pyramid-box">
+        <div class="loader-pyramid">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="ring r3"></div>
+          <span class="pyramid-emoji">🧬</span>
+        </div>
+        <h3 class="loader-title" id="d-loaderLabel">EXTRACTING SAMPLE MATRIX...</h3>
+        <div class="d-progress-track-outer">
+          <div class="d-progress-track-inner" id="d-loaderBarInner"></div>
+        </div>
+        <p class="loader-sub" id="d-loaderSub">Synthesizing crunch density waveforms.</p>
+      </div>
+    </div>
+
+    <!-- Desktop Footer -->
+    <footer class="desktop-footer">
+      <span>POWERED BY <a href="https://aura360.studio" target="_blank" class="footer-aura-link">AURA360STUDIO</a></span>
+      <span>© 2026 SnackSense Core. All rights to chaos reserved.</span>
+    </footer>
+  </div>
+
+
+  <!-- ==========================================================================
+     2. STANDALONE NATIVE MOBILE APP VIEWPORT (Visible on screens <= 768px)
+     ========================================================================== -->
+  <div id="mobileApp" class="mobile-only-container">
     <div class="phone-screen">
       
-      <!-- iOS-style Top Status Bar -->
+      <!-- iOS-style Status Bar -->
       <div class="phone-status-bar">
         <div class="status-left">
           <span class="status-time" id="statusBarTime">21:56</span>
@@ -56,11 +310,11 @@
         </div>
       </div>
 
-      <!-- App Body Workspace (Handles screen rendering inside phone frame) -->
+      <!-- App Body Workspace (Handles screen rendering inside mobile layout) -->
       <div class="app-body">
         
         <!-- ================= WELCOME SCREEN ================= -->
-        <section id="welcomeScreen" class="mobile-tab-view active">
+        <section id="m-welcomeScreen" class="mobile-tab-view active">
           <div class="mobile-splash">
             <div class="splash-logo-area">
               <h1 class="logo-neon" data-text="SNACKSENSE">SNACKSENSE</h1>
@@ -71,7 +325,7 @@
               <div class="terminal-bar">
                 <span>BIOSENSOR_BOOTLOG</span>
               </div>
-              <div class="terminal-scroll" id="terminalBoot">
+              <div class="terminal-scroll" id="m-terminalBoot">
                 <p class="text-green">[SYSTEM] Booting SnackSense Core v1.5.0...</p>
                 <p class="text-green">[SYSTEM] Core Vision layers armed.</p>
                 <p class="text-pink">[WARNING] Sodium proximity radar active.</p>
@@ -79,7 +333,7 @@
             </div>
 
             <div class="welcome-action-box">
-              <button class="native-action-btn pulse-glow" id="btnEnterChamber">
+              <button class="native-action-btn pulse-glow" id="m-btnEnterChamber">
                 <span class="main-text">ARM BIOSENSOR CHAMBER</span>
                 <span class="sub-text">Initialize Vision Scanner</span>
               </button>
@@ -90,10 +344,10 @@
         <!-- ================= TABS CHANNELS CONTAINER ================= -->
         
         <!-- Tab 1: CAMERA SCANNER CHAMBER -->
-        <section id="chamberTab" class="mobile-tab-view">
+        <section id="m-chamberTab" class="mobile-tab-view">
           <div class="camera-viewport-container">
-            <video id="webcamVideo" autoplay playsinline muted></video>
-            <canvas id="detectionCanvas"></canvas>
+            <video id="mobileVideo" autoplay playsinline muted></video>
+            <canvas id="mobileCanvas"></canvas>
             
             <!-- Real-time HUD overlays -->
             <div class="camera-hud-frame">
@@ -104,10 +358,10 @@
               <div class="radar-line"></div>
             </div>
 
-            <div class="chamber-mode-badge" id="hudChamberMode">WEB-CAM STANDBY</div>
+            <div class="chamber-mode-badge" id="m-hudChamberMode">WEB-CAM STANDBY</div>
 
             <!-- Emulator preset snack chamber popup -->
-            <div id="presetContainer" class="preset-overlay hidden">
+            <div id="m-presetContainer" class="preset-overlay hidden">
               <div class="preset-box">
                 <div class="preset-title">SELECT SUSPICIOUS SPECIMEN</div>
                 <div class="preset-native-grid">
@@ -141,48 +395,48 @@
 
             <!-- Shutter Control Center (Overlay at bottom of camera view) -->
             <div class="shutter-control-center">
-              <button class="fallback-mode-toggle" id="btnToggleScannerMode">EMULATE SPECIMEN</button>
+              <button class="fallback-mode-toggle" id="m-btnToggleScannerMode">EMULATE SPECIMEN</button>
               <div class="shutter-circle-outer">
-                <button class="shutter-circle-inner disabled" id="btnTriggerScan" title="Scan Snack"></button>
+                <button class="shutter-circle-inner disabled" id="m-btnTriggerScan" title="Scan Snack"></button>
               </div>
-              <div class="audio-hud-toggle" id="btnHudAudioToggle" title="Mute Audio">🔊</div>
+              <div class="audio-hud-toggle" id="m-btnHudAudioToggle" title="Mute Audio">🔊</div>
             </div>
 
             <!-- Draggable Bottom Sheet Telemetry -->
-            <div class="bottom-sheet-drawer" id="telemetryDrawer">
-              <div class="drawer-header" id="telemetryDrawerHeader">
+            <div class="bottom-sheet-drawer" id="m-telemetryDrawer">
+              <div class="drawer-header" id="m-telemetryDrawerHeader">
                 <div class="drawer-handle"></div>
                 <div class="drawer-header-title">
                   <span>📷 SPECTROMETER_TELEMETRY</span>
-                  <span class="green-indicator" id="drawerClass">Awaiting Capture...</span>
+                  <span class="green-indicator" id="m-drawerClass">Awaiting Capture...</span>
                 </div>
               </div>
               <div class="drawer-content terminal-mono">
                 <div class="metric-row">
                   <span class="label">ACCURACY:</span>
-                  <span class="val text-pink" id="telConfidence">0.00%</span>
+                  <span class="val text-pink" id="m-telConfidence">0.00%</span>
                 </div>
                 <div class="metric-row">
                   <span class="label">TENSOR_FPS:</span>
-                  <span class="val text-green" id="telFPS">00.0 hz</span>
+                  <span class="val text-green" id="m-telFPS">00.0 hz</span>
                 </div>
                 
                 <div class="telemetry-bar-native">
                   <div class="bar-label">Preservative Index</div>
-                  <div class="bar-track"><div class="bar-fill pink" id="barPreservatives" style="width: 0%"></div></div>
+                  <div class="bar-track"><div class="bar-fill pink" id="m-barPreservatives" style="width: 0%"></div></div>
                 </div>
                 
                 <div class="telemetry-bar-native">
                   <div class="bar-label">Chaotic Vibe Matrix</div>
-                  <div class="bar-track"><div class="bar-fill green" id="barVibe" style="width: 0%"></div></div>
+                  <div class="bar-track"><div class="bar-fill green" id="m-barVibe" style="width: 0%"></div></div>
                 </div>
 
                 <div class="telemetry-bar-native">
                   <div class="bar-label">Digestive Regret Chance</div>
-                  <div class="bar-track"><div class="bar-fill amber" id="barRegret" style="width: 0%"></div></div>
+                  <div class="bar-track"><div class="bar-fill amber" id="m-barRegret" style="width: 0%"></div></div>
                 </div>
 
-                <div class="console-mini-ticker" id="scannerTickerConsole">
+                <div class="console-mini-ticker" id="m-scannerTickerConsole">
                   <p class="console-line text-green">&gt; Scanner chamber online.</p>
                 </div>
               </div>
@@ -191,14 +445,13 @@
         </section>
 
         <!-- Tab 2: HISTORICAL LOGS DATABASE -->
-        <section id="logsTab" class="mobile-tab-view">
+        <section id="m-logsTab" class="mobile-tab-view">
           <div class="logs-header-bar">
             <h2>Logged Crimes</h2>
-            <button class="clear-logs-btn" id="btnClearLogs">Clear Log Database</button>
+            <button class="clear-logs-btn" id="m-btnClearLogs">Clear Log Database</button>
           </div>
-          <div class="logs-list-viewport" id="logsContainer">
-            <!-- Dynamic list of previous scans -->
-            <div class="empty-logs-placeholder" id="emptyLogsPlaceholder">
+          <div class="logs-list-viewport" id="m-logsContainer">
+            <div class="empty-logs-placeholder" id="m-emptyLogsPlaceholder">
               <span class="placeholder-icon">🌱</span>
               <h3>LOG DATABASE EMPTY</h3>
               <p>No synthetic snacks processed. Your physical body is currently safe.</p>
@@ -207,7 +460,7 @@
         </section>
 
         <!-- Tab 3: LABORATORY SETTINGS -->
-        <section id="settingsTab" class="mobile-tab-view">
+        <section id="m-settingsTab" class="mobile-tab-view">
           <div class="settings-header-bar">
             <h2>Lab Settings</h2>
           </div>
@@ -221,14 +474,14 @@
                   <span>AI Sarcasm Intensity</span>
                   <p class="row-sub">Increase roast frequency</p>
                 </div>
-                <input type="range" class="native-slider" id="sliderSarcasm" min="10" max="100" value="85">
+                <input type="range" class="native-slider" id="m-sliderSarcasm" min="10" max="100" value="85">
               </div>
               <div class="settings-row">
                 <div class="row-label">
                   <span>MSG Toxicity Limit</span>
                   <p class="row-sub">Spectrometer warning point</p>
                 </div>
-                <input type="range" class="native-slider" id="sliderMSG" min="50" max="100" value="80">
+                <input type="range" class="native-slider" id="m-sliderMSG" min="50" max="100" value="80">
               </div>
             </div>
 
@@ -236,31 +489,24 @@
             <div class="settings-group">
               <div class="group-header">AI PERSONALITY SPECTRA</div>
               <label class="settings-row-radio">
-                <input type="radio" name="aiMood" value="cynical" checked>
+                <input type="radio" name="m-aiMood" value="cynical" checked>
                 <div class="radio-content">
                   <span class="title">Cynical Anthropologist</span>
                   <span class="desc">Analytical, judgmental, and mildly concerned</span>
                 </div>
               </label>
               <label class="settings-row-radio">
-                <input type="radio" name="aiMood" value="chaotic">
+                <input type="radio" name="m-aiMood" value="chaotic">
                 <div class="radio-content">
                   <span class="title">Monosodium Overlord (Chaos)</span>
                   <span class="desc">Fascinated by high sodium, highly unhinged</span>
                 </div>
               </label>
               <label class="settings-row-radio">
-                <input type="radio" name="aiMood" value="cruel">
+                <input type="radio" name="m-aiMood" value="cruel">
                 <div class="radio-content">
                   <span class="title">Active Hostility Mode</span>
                   <span class="desc">Absolutely tears your dietary decisions to pieces</span>
-                </div>
-              </label>
-              <label class="settings-row-radio disabled-row">
-                <input type="radio" name="aiMood" value="locked" disabled>
-                <div class="radio-content">
-                  <span class="title">Encouraging Health Coach (LOCKED)</span>
-                  <span class="desc">Requires organic/non-processed visual inputs</span>
                 </div>
               </label>
             </div>
@@ -274,17 +520,7 @@
                   <p class="row-sub">Toggle Web Audio oscillator beeps</p>
                 </div>
                 <label class="native-toggle-switch">
-                  <input type="checkbox" id="chkAudioEnable" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              <div class="settings-row">
-                <div class="row-label">
-                  <span>TensorFlow vision layers</span>
-                  <p class="row-sub">Client side COCO-SSD processing</p>
-                </div>
-                <label class="native-toggle-switch">
-                  <input type="checkbox" id="chkVisionEnable" checked>
+                  <input type="checkbox" id="m-chkAudioEnable" checked>
                   <span class="toggle-slider"></span>
                 </label>
               </div>
@@ -300,12 +536,6 @@
                 </div>
                 <span class="chevron">&gt;</span>
               </div>
-              <div class="settings-row">
-                <div class="row-label">
-                  <span>Engine Build version</span>
-                  <p class="row-sub">v1.5.0-native-mobile-frame</p>
-                </div>
-              </div>
             </div>
 
           </div>
@@ -314,7 +544,7 @@
         <!-- ================= FULLSCREEN TRANSITIONS VIEWPORTS ================= -->
 
         <!-- FULL OVERLAY 1: MOLECULAR LOADER OVERLAY -->
-        <div id="loaderOverlay" class="full-modal-overlay">
+        <div id="m-loaderOverlay" class="full-modal-overlay">
           <div class="modal-blur-bg"></div>
           <div class="molecular-loader-box">
             <div class="hologram-pyramid-mobile">
@@ -323,90 +553,83 @@
               <div class="laser-ring-mobile r3"></div>
               <div class="analyzer-spinner">🧬</div>
             </div>
-            <div class="loader-primary-label" id="loadingStageText">EXTRACTING SAMPLE PARTICLES...</div>
+            <div class="loader-primary-label" id="m-loadingStageText">EXTRACTING SAMPLE PARTICLES...</div>
             <div class="progress-bar-outer-native">
-              <div class="progress-bar-inner-native" id="loaderBarInner"></div>
+              <div class="progress-bar-inner-native" id="m-loaderBarInner"></div>
             </div>
-            <div class="loader-sub-label" id="loadingSubText">Scanning crispiness index via neural networks.</div>
+            <div class="loader-sub-label" id="m-loadingSubText">Scanning crispiness index via neural networks.</div>
           </div>
         </div>
 
         <!-- FULL SLIDING CARD: THE DIAGNOSTIC RECEIPT RESULTS VIEW -->
-        <div id="resultsView" class="full-modal-overlay sliding-card">
+        <div id="m-resultsView" class="full-modal-overlay sliding-card">
           <div class="results-layout-native">
             
             <div class="results-header-nav">
-              <button class="native-back-btn" id="btnBackFromResults">&lt; RE-ARM CHAMBER</button>
+              <button class="native-back-btn" id="m-btnBackFromResults">&lt; RE-ARM CHAMBER</button>
               <span class="results-title-badge">LOGGED DIAGNOSTIC</span>
             </div>
 
             <div class="results-scrollable-body">
               
               <!-- Thermal Receipt Ticket Card -->
-              <div class="receipt-ticket-native" id="receiptToPrint">
+              <div class="receipt-ticket-native" id="m-receiptToPrint">
                 <div class="thermal-laser-burn"></div>
                 <div class="ticket-contents">
-                  <!-- Header -->
                   <div class="ticket-header">
                     <h3>SNACKSENSE™ BIO-REPORT</h3>
                     <div class="ticket-sub">AURA LABS NEURAL RESEARCH</div>
                     <div class="ticket-dashes">--------------------------------</div>
                   </div>
 
-                  <!-- Metadata -->
                   <div class="ticket-meta-block">
-                    <div class="t-row"><span>SCAN_ID:</span> <span id="receiptScanId" class="bold-text">#9244-C92</span></div>
-                    <div class="t-row"><span>TIMESTAMP:</span> <span id="receiptTimestamp">2026-05-19 21:56</span></div>
+                    <div class="t-row"><span>SCAN_ID:</span> <span id="m-recScanId" class="bold-text">#9244-C92</span></div>
+                    <div class="t-row"><span>TIMESTAMP:</span> <span id="m-recTimestamp">2026-05-19 21:56</span></div>
                     <div class="t-row"><span>BIO_LENSE:</span> <span class="bold-text">MOBILE_VISION</span></div>
                   </div>
                   <div class="ticket-dashes">--------------------------------</div>
 
-                  <!-- Specimen Stats -->
                   <div class="ticket-section-title">SPECIMEN DIAGNOSTICS</div>
                   <div class="ticket-stats-block">
-                    <div class="t-row highlight"><span class="bold-text">SPECIMEN:</span> <span id="receiptDetected" class="text-pink bold-text">UNKNOWN</span></div>
-                    <div class="t-row"><span>MSG SATURATION:</span> <span id="receiptMSG">98.4%</span></div>
-                    <div class="t-row"><span>CRUNCH INDEX:</span> <span id="receiptCrunch">9.2 / 10.0</span></div>
-                    <div class="t-row"><span>IMPULSIVITY:</span> <span id="receiptImpulsivity">87.0%</span></div>
+                    <div class="t-row highlight"><span class="bold-text">SPECIMEN:</span> <span id="m-recDetected" class="text-pink bold-text">UNKNOWN</span></div>
+                    <div class="t-row"><span>MSG SATURATION:</span> <span id="m-recMSG">98.4%</span></div>
+                    <div class="t-row"><span>CRUNCH INDEX:</span> <span id="m-recCrunch">9.2 / 10.0</span></div>
+                    <div class="t-row"><span>IMPULSIVITY:</span> <span id="m-recImpulsivity">87.0%</span></div>
                   </div>
                   <div class="ticket-dashes">--------------------------------</div>
 
-                  <!-- Anthropological Diagnostics -->
                   <div class="ticket-section-title">PSYCHOSOCIAL ANALYSIS</div>
                   <div class="ticket-profile-box">
                     <span class="profile-label">Socioeconomic Tier:</span>
-                    <p class="profile-value bold-text text-amber" id="receiptTier">LATE NIGHT DEVELOPER COPE</p>
+                    <p class="profile-value bold-text text-amber" id="m-recTier">LATE NIGHT DEVELOPER COPE</p>
                   </div>
                   <div class="ticket-profile-box">
                     <span class="profile-label">AI Tasting Notes:</span>
-                    <p class="profile-value italic-text" id="receiptNotes">"Synthetic cheddar powder, compiler failures, and severe procrastination."</p>
+                    <p class="profile-value italic-text" id="m-recNotes">"Synthetic cheddar powder, compiler failures, and severe procrastination."</p>
                   </div>
                   <div class="ticket-profile-box">
                     <span class="profile-label">Anthropological Diagnostic:</span>
-                    <p class="profile-value" id="receiptAudit">"Subject appears to be utilizing this artificial food substance to mask critical email stress. Vibe Check: Endangered."</p>
+                    <p class="profile-value" id="m-recAudit">"Subject appears to be utilizing this artificial food substance to mask critical email stress. Vibe Check: Endangered."</p>
                   </div>
                   <div class="ticket-dashes">--------------------------------</div>
 
-                  <!-- Footer Barcode -->
                   <div class="ticket-footer">
                     <div class="ticket-barcode">||||| | ||||| ||| | ||| ||||</div>
                     <div class="ticket-barcode-num">AURA360_BIORECON_SEC_7</div>
-                    <p class="ticket-disclaimer">Thank you for consuming artificial ingredients.<br>Your coping mechanisms have been parsed.</p>
                   </div>
                 </div>
               </div>
 
               <!-- Spectrogram Wave and Oscilloscope Actions -->
               <div class="results-native-lab-modules">
-                
                 <!-- Snack Aura Panel -->
                 <div class="native-lab-box">
                   <span class="box-title">SPECIMEN AURA GRADIENT</span>
                   <div class="mobile-aura-container">
-                    <canvas id="auraCanvas"></canvas>
+                    <canvas id="mobileAuraCanvas"></canvas>
                     <div class="aura-float-info">
-                      <div>AURA: <span id="auraName" class="bold-text text-pink">NEURAL FIELD</span></div>
-                      <div>STABILITY: <span id="auraStability">12%</span></div>
+                      <div>AURA: <span id="m-auraName" class="bold-text text-pink">NEURAL FIELD</span></div>
+                      <div>STABILITY: <span id="m-auraStability">12%</span></div>
                     </div>
                   </div>
                 </div>
@@ -415,25 +638,24 @@
                 <div class="native-lab-box">
                   <span class="box-title">CRUNCH SPECTRO-FREQUENCY</span>
                   <div class="mobile-osc-box">
-                    <button class="native-action-btn secondary" id="btnPlayCrunchWave">
+                    <button class="native-action-btn secondary" id="m-btnPlayCrunchWave">
                       <span>🔊 DECRYPT CRISPINESS AUDIO</span>
                     </button>
                     <div class="mobile-osc-canvas-wrap">
-                      <canvas id="oscilloscopeCanvas"></canvas>
+                      <canvas id="mobileOscilloscopeCanvas"></canvas>
                     </div>
                   </div>
                 </div>
 
                 <!-- Shared System Action Sheets -->
                 <div class="results-action-grid">
-                  <button class="native-action-btn" id="btnDownloadReceipt">
+                  <button class="native-action-btn" id="m-btnDownloadReceipt">
                     <span>📥 SAVE TO PHONE GALLERY</span>
                   </button>
-                  <button class="native-action-btn secondary" id="btnShareCopy">
+                  <button class="native-action-btn secondary" id="m-btnShareCopy">
                     <span>🔗 COPY SHAREABLE CARD</span>
                   </button>
                 </div>
-
               </div>
 
             </div>
@@ -444,15 +666,15 @@
 
       <!-- iOS-style Morphic Bottom Tab Bar (Navigation) -->
       <nav class="bottom-tab-bar" id="bottomTabBar">
-        <button class="tab-item active" data-tab="chamberTab" id="tabBtnChamber">
+        <button class="tab-item active" data-tab="m-chamberTab" id="tabBtnChamber">
           <span class="tab-icon">📷</span>
           <span class="tab-label">Chamber</span>
         </button>
-        <button class="tab-item" data-tab="logsTab" id="tabBtnLogs">
+        <button class="tab-item" data-tab="m-logsTab" id="tabBtnLogs">
           <span class="tab-icon">🧾</span>
           <span class="tab-label">Crimes Log</span>
         </button>
-        <button class="tab-item" data-tab="settingsTab" id="tabBtnSettings">
+        <button class="tab-item" data-tab="m-settingsTab" id="tabBtnSettings">
           <span class="tab-icon">⚙️</span>
           <span class="tab-label">Lab Settings</span>
         </button>
