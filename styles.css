@@ -45,6 +45,11 @@ body {
   position: relative;
 }
 
+/* --- Core Display Utilities --- */
+.hidden {
+  display: none !important;
+}
+
 /* --- CRT Screen Filter Overlay --- */
 .crt-filter::after {
   content: " ";
