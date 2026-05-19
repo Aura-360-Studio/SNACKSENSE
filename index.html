@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SnackSense™ // Mobile Laboratory</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Google Fonts for Native Cyber Aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Vanilla CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- TensorFlow.js and COCO-SSD model (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" defer></script>
+</head>
+<body class="crt-filter">
+  <div class="cyber-grid"></div>
+
+  <!-- Physical Smartphone Wrapper (Visible on Desktop, Stripped on Mobile) -->
+  <div class="phone-device">
+    <!-- Physical Side buttons -->
+    <div class="phone-button volume-up"></div>
+    <div class="phone-button volume-down"></div>
+    <div class="phone-button power-key"></div>
+    
+    <!-- Phone Screen Container -->
+    <div class="phone-screen">
+      
+      <!-- iOS-style Top Status Bar -->
+      <div class="phone-status-bar">
+        <div class="status-left">
+          <span class="status-time" id="statusBarTime">21:56</span>
+          <span class="status-carrier">AURA 5G</span>
+        </div>
+        
+        <!-- Dynamic Island Cutout (Notch) -->
+        <div class="dynamic-island" id="dynamicIsland">
+          <div class="island-camera"></div>
+          <div class="island-pulse" id="islandPulse"></div>
+          <span class="island-text" id="islandText">SYS READY</span>
+        </div>
+        
+        <div class="status-right">
+          <span class="status-icon wifi">📶</span>
+          <span class="status-icon signal">🛜</span>
+          <div class="battery-container">
+            <span class="battery-percent" id="statusBarBatteryPercent">89%</span>
+            <div class="battery-icon">
+              <div class="battery-fill" id="statusBarBatteryFill" style="width: 89%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Body Workspace (Handles screen rendering inside phone frame) -->
+      <div class="app-body">
+        
+        <!-- ================= WELCOME SCREEN ================= -->
+        <section id="welcomeScreen" class="mobile-tab-view active">
+          <div class="mobile-splash">
+            <div class="splash-logo-area">
+              <h1 class="logo-neon" data-text="SNACKSENSE">SNACKSENSE</h1>
+              <div class="mobile-tagline">ARTIFICIAL INTEL FOR ARTIFICIAL INGREDIENTS</div>
+            </div>
+
+            <div class="mobile-terminal-box">
+              <div class="terminal-bar">
+                <span>BIOSENSOR_BOOTLOG</span>
+              </div>
+              <div class="terminal-scroll" id="terminalBoot">
+                <p class="text-green">[SYSTEM] Booting SnackSense Core v1.5.0...</p>
+                <p class="text-green">[SYSTEM] Core Vision layers armed.</p>
+                <p class="text-pink">[WARNING] Sodium proximity radar active.</p>
+              </div>
+            </div>
+
+            <div class="welcome-action-box">
+              <button class="native-action-btn pulse-glow" id="btnEnterChamber">
+                <span class="main-text">ARM BIOSENSOR CHAMBER</span>
+                <span class="sub-text">Initialize Vision Scanner</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TABS CHANNELS CONTAINER ================= -->
+        
+        <!-- Tab 1: CAMERA SCANNER CHAMBER -->
+        <section id="chamberTab" class="mobile-tab-view">
+          <div class="camera-viewport-container">
+            <video id="webcamVideo" autoplay playsinline muted></video>
+            <canvas id="detectionCanvas"></canvas>
+            
+            <!-- Real-time HUD overlays -->
+            <div class="camera-hud-frame">
+              <div class="corner-cross tl"></div>
+              <div class="corner-cross tr"></div>
+              <div class="corner-cross bl"></div>
+              <div class="corner-cross br"></div>
+              <div class="radar-line"></div>
+            </div>
+
+            <div class="chamber-mode-badge" id="hudChamberMode">WEB-CAM STANDBY</div>
+
+            <!-- Emulator preset snack chamber popup -->
+            <div id="presetContainer" class="preset-overlay hidden">
+              <div class="preset-box">
+                <div class="preset-title">SELECT SUSPICIOUS SPECIMEN</div>
+                <div class="preset-native-grid">
+                  <button class="preset-native-btn" data-snack="spicy_chips">
+                    <span class="btn-emoji">🔥</span>
+                    <span class="btn-label">Spicy Chips</span>
+                  </button>
+                  <button class="preset-native-btn" data-snack="ramen">
+                    <span class="btn-emoji">🍜</span>
+                    <span class="btn-label">Instant Ramen</span>
+                  </button>
+                  <button class="preset-native-btn" data-snack="energy_drink">
+                    <span class="btn-emoji">⚡</span>
+                    <span class="btn-label">Energy Drink</span>
+                  </button>
+                  <button class="preset-native-btn" data-snack="cookie">
+                    <span class="btn-emoji">🍪</span>
+                    <span class="btn-label">Desk Cookie</span>
+                  </button>
+                  <button class="preset-native-btn" data-snack="pizza">
+                    <span class="btn-emoji">🍕</span>
+                    <span class="btn-label">Midnight Pizza</span>
+                  </button>
+                  <button class="preset-native-btn" data-snack="banana">
+                    <span class="btn-emoji">🍌</span>
+                    <span class="btn-label">Sane Banana</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shutter Control Center (Overlay at bottom of camera view) -->
+            <div class="shutter-control-center">
+              <button class="fallback-mode-toggle" id="btnToggleScannerMode">EMULATE SPECIMEN</button>
+              <div class="shutter-circle-outer">
+                <button class="shutter-circle-inner disabled" id="btnTriggerScan" title="Scan Snack"></button>
+              </div>
+              <div class="audio-hud-toggle" id="btnHudAudioToggle" title="Mute Audio">🔊</div>
+            </div>
+
+            <!-- Draggable Bottom Sheet Telemetry -->
+            <div class="bottom-sheet-drawer" id="telemetryDrawer">
+              <div class="drawer-header" id="telemetryDrawerHeader">
+                <div class="drawer-handle"></div>
+                <div class="drawer-header-title">
+                  <span>📷 SPECTROMETER_TELEMETRY</span>
+                  <span class="green-indicator" id="drawerClass">Awaiting Capture...</span>
+                </div>
+              </div>
+              <div class="drawer-content terminal-mono">
+                <div class="metric-row">
+                  <span class="label">ACCURACY:</span>
+                  <span class="val text-pink" id="telConfidence">0.00%</span>
+                </div>
+                <div class="metric-row">
+                  <span class="label">TENSOR_FPS:</span>
+                  <span class="val text-green" id="telFPS">00.0 hz</span>
+                </div>
+                
+                <div class="telemetry-bar-native">
+                  <div class="bar-label">Preservative Index</div>
+                  <div class="bar-track"><div class="bar-fill pink" id="barPreservatives" style="width: 0%"></div></div>
+                </div>
+                
+                <div class="telemetry-bar-native">
+                  <div class="bar-label">Chaotic Vibe Matrix</div>
+                  <div class="bar-track"><div class="bar-fill green" id="barVibe" style="width: 0%"></div></div>
+                </div>
+
+                <div class="telemetry-bar-native">
+                  <div class="bar-label">Digestive Regret Chance</div>
+                  <div class="bar-track"><div class="bar-fill amber" id="barRegret" style="width: 0%"></div></div>
+                </div>
+
+                <div class="console-mini-ticker" id="scannerTickerConsole">
+                  <p class="console-line text-green">&gt; Scanner chamber online.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: HISTORICAL LOGS DATABASE -->
+        <section id="logsTab" class="mobile-tab-view">
+          <div class="logs-header-bar">
+            <h2>Logged Crimes</h2>
+            <button class="clear-logs-btn" id="btnClearLogs">Clear Log Database</button>
+          </div>
+          <div class="logs-list-viewport" id="logsContainer">
+            <!-- Dynamic list of previous scans -->
+            <div class="empty-logs-placeholder" id="emptyLogsPlaceholder">
+              <span class="placeholder-icon">🌱</span>
+              <h3>LOG DATABASE EMPTY</h3>
+              <p>No synthetic snacks processed. Your physical body is currently safe.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: LABORATORY SETTINGS -->
+        <section id="settingsTab" class="mobile-tab-view">
+          <div class="settings-header-bar">
+            <h2>Lab Settings</h2>
+          </div>
+          <div class="settings-scroll-container">
+            
+            <!-- Group 1: Neural Configs -->
+            <div class="settings-group">
+              <div class="group-header">NEURAL CORRELATION ENGINE</div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span>AI Sarcasm Intensity</span>
+                  <p class="row-sub">Increase roast frequency</p>
+                </div>
+                <input type="range" class="native-slider" id="sliderSarcasm" min="10" max="100" value="85">
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span>MSG Toxicity Limit</span>
+                  <p class="row-sub">Spectrometer warning point</p>
+                </div>
+                <input type="range" class="native-slider" id="sliderMSG" min="50" max="100" value="80">
+              </div>
+            </div>
+
+            <!-- Group 2: AI Personality Mood -->
+            <div class="settings-group">
+              <div class="group-header">AI PERSONALITY SPECTRA</div>
+              <label class="settings-row-radio">
+                <input type="radio" name="aiMood" value="cynical" checked>
+                <div class="radio-content">
+                  <span class="title">Cynical Anthropologist</span>
+                  <span class="desc">Analytical, judgmental, and mildly concerned</span>
+                </div>
+              </label>
+              <label class="settings-row-radio">
+                <input type="radio" name="aiMood" value="chaotic">
+                <div class="radio-content">
+                  <span class="title">Monosodium Overlord (Chaos)</span>
+                  <span class="desc">Fascinated by high sodium, highly unhinged</span>
+                </div>
+              </label>
+              <label class="settings-row-radio">
+                <input type="radio" name="aiMood" value="cruel">
+                <div class="radio-content">
+                  <span class="title">Active Hostility Mode</span>
+                  <span class="desc">Absolutely tears your dietary decisions to pieces</span>
+                </div>
+              </label>
+              <label class="settings-row-radio disabled-row">
+                <input type="radio" name="aiMood" value="locked" disabled>
+                <div class="radio-content">
+                  <span class="title">Encouraging Health Coach (LOCKED)</span>
+                  <span class="desc">Requires organic/non-processed visual inputs</span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Group 3: Device Controls -->
+            <div class="settings-group">
+              <div class="group-header">SYSTEM PERFORMANCES</div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span>Synthesized Sound Effects</span>
+                  <p class="row-sub">Toggle Web Audio oscillator beeps</p>
+                </div>
+                <label class="native-toggle-switch">
+                  <input type="checkbox" id="chkAudioEnable" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span>TensorFlow vision layers</span>
+                  <p class="row-sub">Client side COCO-SSD processing</p>
+                </div>
+                <label class="native-toggle-switch">
+                  <input type="checkbox" id="chkVisionEnable" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Group 4: About Info -->
+            <div class="settings-group">
+              <div class="group-header">ABOUT SNACKSENSE</div>
+              <div class="settings-row clickable" onclick="window.open('https://aura360.studio','_blank')">
+                <div class="row-label">
+                  <span>Powered by Aura360Studio</span>
+                  <p class="row-sub">Explore the labs portfolio</p>
+                </div>
+                <span class="chevron">&gt;</span>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <span>Engine Build version</span>
+                  <p class="row-sub">v1.5.0-native-mobile-frame</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= FULLSCREEN TRANSITIONS VIEWPORTS ================= -->
+
+        <!-- FULL OVERLAY 1: MOLECULAR LOADER OVERLAY -->
+        <div id="loaderOverlay" class="full-modal-overlay">
+          <div class="modal-blur-bg"></div>
+          <div class="molecular-loader-box">
+            <div class="hologram-pyramid-mobile">
+              <div class="laser-ring-mobile r1"></div>
+              <div class="laser-ring-mobile r2"></div>
+              <div class="laser-ring-mobile r3"></div>
+              <div class="analyzer-spinner">🧬</div>
+            </div>
+            <div class="loader-primary-label" id="loadingStageText">EXTRACTING SAMPLE PARTICLES...</div>
+            <div class="progress-bar-outer-native">
+              <div class="progress-bar-inner-native" id="loaderBarInner"></div>
+            </div>
+            <div class="loader-sub-label" id="loadingSubText">Scanning crispiness index via neural networks.</div>
+          </div>
+        </div>
+
+        <!-- FULL SLIDING CARD: THE DIAGNOSTIC RECEIPT RESULTS VIEW -->
+        <div id="resultsView" class="full-modal-overlay sliding-card">
+          <div class="results-layout-native">
+            
+            <div class="results-header-nav">
+              <button class="native-back-btn" id="btnBackFromResults">&lt; RE-ARM CHAMBER</button>
+              <span class="results-title-badge">LOGGED DIAGNOSTIC</span>
+            </div>
+
+            <div class="results-scrollable-body">
+              
+              <!-- Thermal Receipt Ticket Card -->
+              <div class="receipt-ticket-native" id="receiptToPrint">
+                <div class="thermal-laser-burn"></div>
+                <div class="ticket-contents">
+                  <!-- Header -->
+                  <div class="ticket-header">
+                    <h3>SNACKSENSE™ BIO-REPORT</h3>
+                    <div class="ticket-sub">AURA LABS NEURAL RESEARCH</div>
+                    <div class="ticket-dashes">--------------------------------</div>
+                  </div>
+
+                  <!-- Metadata -->
+                  <div class="ticket-meta-block">
+                    <div class="t-row"><span>SCAN_ID:</span> <span id="receiptScanId" class="bold-text">#9244-C92</span></div>
+                    <div class="t-row"><span>TIMESTAMP:</span> <span id="receiptTimestamp">2026-05-19 21:56</span></div>
+                    <div class="t-row"><span>BIO_LENSE:</span> <span class="bold-text">MOBILE_VISION</span></div>
+                  </div>
+                  <div class="ticket-dashes">--------------------------------</div>
+
+                  <!-- Specimen Stats -->
+                  <div class="ticket-section-title">SPECIMEN DIAGNOSTICS</div>
+                  <div class="ticket-stats-block">
+                    <div class="t-row highlight"><span class="bold-text">SPECIMEN:</span> <span id="receiptDetected" class="text-pink bold-text">UNKNOWN</span></div>
+                    <div class="t-row"><span>MSG SATURATION:</span> <span id="receiptMSG">98.4%</span></div>
+                    <div class="t-row"><span>CRUNCH INDEX:</span> <span id="receiptCrunch">9.2 / 10.0</span></div>
+                    <div class="t-row"><span>IMPULSIVITY:</span> <span id="receiptImpulsivity">87.0%</span></div>
+                  </div>
+                  <div class="ticket-dashes">--------------------------------</div>
+
+                  <!-- Anthropological Diagnostics -->
+                  <div class="ticket-section-title">PSYCHOSOCIAL ANALYSIS</div>
+                  <div class="ticket-profile-box">
+                    <span class="profile-label">Socioeconomic Tier:</span>
+                    <p class="profile-value bold-text text-amber" id="receiptTier">LATE NIGHT DEVELOPER COPE</p>
+                  </div>
+                  <div class="ticket-profile-box">
+                    <span class="profile-label">AI Tasting Notes:</span>
+                    <p class="profile-value italic-text" id="receiptNotes">"Synthetic cheddar powder, compiler failures, and severe procrastination."</p>
+                  </div>
+                  <div class="ticket-profile-box">
+                    <span class="profile-label">Anthropological Diagnostic:</span>
+                    <p class="profile-value" id="receiptAudit">"Subject appears to be utilizing this artificial food substance to mask critical email stress. Vibe Check: Endangered."</p>
+                  </div>
+                  <div class="ticket-dashes">--------------------------------</div>
+
+                  <!-- Footer Barcode -->
+                  <div class="ticket-footer">
+                    <div class="ticket-barcode">||||| | ||||| ||| | ||| ||||</div>
+                    <div class="ticket-barcode-num">AURA360_BIORECON_SEC_7</div>
+                    <p class="ticket-disclaimer">Thank you for consuming artificial ingredients.<br>Your coping mechanisms have been parsed.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Spectrogram Wave and Oscilloscope Actions -->
+              <div class="results-native-lab-modules">
+                
+                <!-- Snack Aura Panel -->
+                <div class="native-lab-box">
+                  <span class="box-title">SPECIMEN AURA GRADIENT</span>
+                  <div class="mobile-aura-container">
+                    <canvas id="auraCanvas"></canvas>
+                    <div class="aura-float-info">
+                      <div>AURA: <span id="auraName" class="bold-text text-pink">NEURAL FIELD</span></div>
+                      <div>STABILITY: <span id="auraStability">12%</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sound Oscilloscope Panel -->
+                <div class="native-lab-box">
+                  <span class="box-title">CRUNCH SPECTRO-FREQUENCY</span>
+                  <div class="mobile-osc-box">
+                    <button class="native-action-btn secondary" id="btnPlayCrunchWave">
+                      <span>🔊 DECRYPT CRISPINESS AUDIO</span>
+                    </button>
+                    <div class="mobile-osc-canvas-wrap">
+                      <canvas id="oscilloscopeCanvas"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Shared System Action Sheets -->
+                <div class="results-action-grid">
+                  <button class="native-action-btn" id="btnDownloadReceipt">
+                    <span>📥 SAVE TO PHONE GALLERY</span>
+                  </button>
+                  <button class="native-action-btn secondary" id="btnShareCopy">
+                    <span>🔗 COPY SHAREABLE CARD</span>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- iOS-style Morphic Bottom Tab Bar (Navigation) -->
+      <nav class="bottom-tab-bar" id="bottomTabBar">
+        <button class="tab-item active" data-tab="chamberTab" id="tabBtnChamber">
+          <span class="tab-icon">📷</span>
+          <span class="tab-label">Chamber</span>
+        </button>
+        <button class="tab-item" data-tab="logsTab" id="tabBtnLogs">
+          <span class="tab-icon">🧾</span>
+          <span class="tab-label">Crimes Log</span>
+        </button>
+        <button class="tab-item" data-tab="settingsTab" id="tabBtnSettings">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Lab Settings</span>
+        </button>
+      </nav>
+
+      <!-- iOS Bottom home swipe bar indicator -->
+      <div class="home-indicator-bar">
+        <div class="home-indicator"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Vanilla JS Engine -->
+  <script src="app.js" defer></script>
+</body>
+</html>
